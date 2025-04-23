@@ -1,18 +1,13 @@
-import books from "../book-data";
-import BookCard from "../components/BookCard";
-
+import { useSelector } from "react-redux";
+import Book from "../types/Book";
+import { RootState } from "../redux/store";
+import BookDisplay from "../components/BookDisplay";
 
 function Home() {
+    const books: Book[] = useSelector((state: RootState) => state.books.bookIDs.map((id: number) => state.books.books[id]));
+    
     return (
-        <div className="container-fluid mt-5 px-4">
-            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                {books.map((book, index) => (
-                    <div className="col" key={book.isbn}>
-                        <BookCard book={book} number={index}/>
-                    </div>
-                ))}
-            </div>
-        </div>
+        <BookDisplay books={books} />
     );
 }
 

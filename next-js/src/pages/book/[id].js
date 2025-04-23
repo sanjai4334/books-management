@@ -3,8 +3,9 @@ import { useRouter } from 'next/router';
 
 export default function BookDetails() {
     const router = useRouter();
-    const { number } = router.query;
-    const book = books[number];
+    const { id } = router.query;
+    const book = books.find((book) => book._id == id);
+    
 
     if (!book) {
         return (

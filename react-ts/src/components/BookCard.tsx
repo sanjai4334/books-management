@@ -1,22 +1,24 @@
 import { useState } from "react";
 import Book from "../types/Book";
+import CardImage from "./CardImage";
+import { useDispatch, useSelector } from "react-redux";
+import { favoriteBook } from "../redux/slices/bookSlice";
+import { RootState } from "../redux/store";
 
-function BookCard({ book, number }: { book: Book, number: number }) {
-    const [isFavorite, setIsFavorite] = useState(book.favorite || false);
-
+function BookCard({ book }: { book: Book }) {
+    const dispatch = useDispatch();
+    const isFavorite = useSelector((state: RootState) => state.books.favoriteIDs.includes(book._id));
+    
     const toggleFavorite = () => {
-        setIsFavorite(!isFavorite);
+        dispatch(favoriteBook(book._id));
     };
 
     return (
         <div className="card h-100 shadow-sm">
             <div className="position-relative">
-                <img
-                    src={book.thumbnailUrl}
-                    className="card-img-top"
-                    alt={book.title}
-                    style={{ maxHeight: "300px", objectFit: "cover" }}
-                />
+                <div style={ {minHeight: "300px"} }>
+                    <CardImage thumbnailUrl={book.thumbnailUrl} title={book.title} />
+                </div>
                 <button
                     className={`bg-transparent position-absolute top-0 end-0 btn p-2 ${
                         isFavorite ? "text-danger" : ""
@@ -47,7 +49,7 @@ function BookCard({ book, number }: { book: Book, number: number }) {
                     </div>
                 </div>
                 <div className="mt-auto">
-                    <a className="btn btn-outline-primary w-100" href={`http://localhost:3000/book/${number}`}>View Details</a>
+                    <a className="btn btn-outline-primary w-100" href={`http://localhost:3000/book/${book._id}`}>View Details</a>
                 </div>
             </div>
         </div>

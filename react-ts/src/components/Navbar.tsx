@@ -24,11 +24,11 @@ function Navbar() {
                             <Link className="nav-link" to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/favorites">Favourites</Link>
+                            <Link className="nav-link" to="/favorites">Favorites</Link>
                         </li>
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                             <Link className="nav-link" to="/advanced-search">Advanced Search</Link>
-                        </li>
+                        </li> */}
                     </ul>
 
                     <form className="d-flex" role="search">
