@@ -2,13 +2,13 @@
 
 ## Getting Started
 ### How to run the project
-    In the root folder run these commands
-    ```bash
-    npm run install
-    ```
-    ```bash
-    npm run dev
-    ```
+In the root folder run these commands
+```bash
+npm run install
+```
+```bash
+npm run dev
+```
 
 
 ## Pages & Features
