@@ -5,23 +5,7 @@ import BookDisplay from '../components/BookDisplay';
 import Book from '../types/Book';
 import { RootState } from '../redux/store';
 import Typing from '../components/inputs/Typing';
-
-interface FormState {
-    title: string;
-    isbn: string;
-    pageCount: string;
-    dateFrom: string;
-    dateTo: string;
-    status: string;
-    authors: string;
-}
-
-interface ValidationErrors {
-    title?: string;
-    isbn?: string;
-    pageCount?: string;
-    authors?: string;
-}
+import { FormState, ValidationErrors } from '../types/AdvancedSearchTypes';
 
 function AdvancedSearch() {
     const [formData, setFormData] = useState<FormState>({

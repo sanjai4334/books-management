@@ -1,13 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Book from "../../types/Book";
-
-interface BookState { 
-    books: { 
-        [id: number]: Book 
-    }, 
-    bookIDs: number[], 
-    favoriteIDs: number[]
-};
+import BookState from "../../types/BookState";
 
 const initialState: BookState = {
     books: {},

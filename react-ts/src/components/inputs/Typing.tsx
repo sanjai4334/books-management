@@ -1,15 +1,4 @@
-import { ChangeEvent } from 'react';
-
-interface TypingProps {
-    label: string;
-    name: string;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-    type?: string;
-    placeholder?: string;
-    parentClass?: string;
-    error?: string;
-}
+import TypingProps from "../../types/TypingProps";
 
 function Typing({ 
     label, 

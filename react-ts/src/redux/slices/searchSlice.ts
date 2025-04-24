@@ -1,16 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface SearchState {
-    title: string;
-    isbn: string;
-    pageCount: number;
-    dateFrom: string;
-    dateTo: string;
-    status: string;
-    authors: string[];
-    categories: string[];
-    isSearchActive: boolean;
-}
+import SearchState from "../../types/SearchState";
 
 const initialState: SearchState = {
     title: '',
@@ -31,7 +20,7 @@ const searchSlice = createSlice({
         setSearchCriteria: (state, action: PayloadAction<Partial<SearchState>>) => {
             return { ...state, ...action.payload, isSearchActive: true };
         },
-        clearSearch: (state) => {
+        clearSearch: () => {
             return { ...initialState };
         }
     }
