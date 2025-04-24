@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
 import Home from "./pages/Home"
 import Favorites from "./pages/Favorites"
-// import AdvancedSearch from "./pages/AdvancedSearch"
+import AdvancedSearch from "./pages/AdvancedSearch"
 import { useDispatch } from "react-redux"
 import { setBooks } from "./redux/slices/bookSlice"
 import books from "./book-data"
@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/favorites" element={<Favorites />} />
-        {/* <Route path="/advanced-search" element={<AdvancedSearch />} /> */}
+        <Route path="/advanced-search" element={<AdvancedSearch />} />
       </Routes>
     </>
   )

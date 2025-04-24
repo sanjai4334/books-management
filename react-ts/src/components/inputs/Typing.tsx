@@ -1,22 +1,38 @@
+import { ChangeEvent } from 'react';
+
 interface TypingProps {
-    type?: string;
     label: string;
     name: string;
     value: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-};
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    type?: string;
+    placeholder?: string;
+    parentClass?: string;
+    error?: string;
+}
 
-function Typing({type, label, name, value, onChange}: TypingProps) {
+function Typing({ 
+    label, 
+    name, 
+    value, 
+    onChange, 
+    type = "text", 
+    placeholder = "", 
+    parentClass = "col-md-6",
+    error
+}: TypingProps) {
     return (
-        <div className="col-md-6">
+        <div className={parentClass}>
             <label className="form-label">{label}</label>
             <input
-                type={type || "text"}
+                type={type}
+                className={`form-control ${error ? 'is-invalid' : ''}`}
                 name={name}
-                className="form-control"
                 value={value}
                 onChange={onChange}
+                placeholder={placeholder}
             />
+            {error && <div className="invalid-feedback">{error}</div>}
         </div>
     );
 }

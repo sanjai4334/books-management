@@ -16,6 +16,13 @@ interface FormState {
     authors: string;
 }
 
+interface ValidationErrors {
+    title?: string;
+    isbn?: string;
+    pageCount?: string;
+    authors?: string;
+}
+
 function AdvancedSearch() {
     const [formData, setFormData] = useState<FormState>({
         title: '',
@@ -26,6 +33,7 @@ function AdvancedSearch() {
         status: '',
         authors: ''
     });
+    const [errors, setErrors] = useState<ValidationErrors>({});
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     const categories = [
@@ -52,8 +60,41 @@ function AdvancedSearch() {
 
     const dispatch = useDispatch();
 
+    const isFormValid = () => {
+        const newErrors: ValidationErrors = {};
+        const hasValue = Object.values(formData).some(value => value.trim() !== '') || 
+                        selectedCategories.length > 0;
+        
+        if (!hasValue) {
+            newErrors.title = 'At least one field is required';
+            setErrors(newErrors);
+            return false;
+        }
+
+        if (formData.isbn && !/^\d{10,13}$/.test(formData.isbn)) {
+            newErrors.isbn = 'ISBN must be 10-13 digits';
+        }
+
+        if (formData.title && !/^[A-Za-z0-9.,\s]*$/.test(formData.title)) {
+            newErrors.title = 'Invalid characters in title';
+        }
+
+        if (formData.pageCount && !/^\d+$/.test(formData.pageCount)) {
+            newErrors.pageCount = 'Must be a number';
+        }
+
+        if (formData.authors && !/^[A-Za-z\s,]*$/.test(formData.authors)) {
+            newErrors.authors = 'Invalid characters in authors';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!isFormValid()) return;
+        
         const searchData = {
             ...formData,
             pageCount: parseInt(formData.pageCount) || 0,
@@ -80,146 +121,150 @@ function AdvancedSearch() {
     const books: Book[] = useSelector((state: RootState) => state.books.bookIDs.map((id: number) => state.books.books[id]));
     const searchCriteria = useSelector((state: RootState) => state.search);
 
+    const hasAnySearchCriteria = () => {
+        return Object.values(formData).some(value => value.trim() !== '') || 
+               selectedCategories.length > 0;
+    };
+
     const filteredBooks = books.filter(book => {
-        if (!searchCriteria.isSearchActive) return true;
+        if (!searchCriteria.isSearchActive || !hasAnySearchCriteria()) return false;
 
-        const matchesTitle = !searchCriteria.title || book.title.toLowerCase().includes(searchCriteria.title.toLowerCase());
-        const matchesIsbn = !searchCriteria.isbn || book.isbn.includes(searchCriteria.isbn);
-        const matchesPageCount = !searchCriteria.pageCount || book.pageCount >= searchCriteria.pageCount;
-        const matchesStatus = !searchCriteria.status || book.status.toLowerCase() === searchCriteria.status.toLowerCase();
+        const matchesTitle = !formData.title || 
+            book.title.toLowerCase().includes(formData.title.toLowerCase());
+
+        const matchesIsbn = !formData.isbn || 
+            book.isbn === formData.isbn;
+
+        const matchesPageCount = !formData.pageCount || 
+            book.pageCount === parseInt(formData.pageCount);
+
+        const matchesStatus = !formData.status || 
+            book.status.toLowerCase() === formData.status.toLowerCase();
         
-        const matchesDate = (!searchCriteria.dateFrom || new Date(book.publishedDate.$date) >= new Date(searchCriteria.dateFrom)) &&
-                           (!searchCriteria.dateTo || new Date(book.publishedDate.$date) <= new Date(searchCriteria.dateTo));
+        const matchesDate = (!formData.dateFrom || new Date(book.publishedDate.$date) >= new Date(formData.dateFrom)) &&
+                           (!formData.dateTo || new Date(book.publishedDate.$date) <= new Date(formData.dateTo));
         
-        const matchesAuthors = searchCriteria.authors.length === 0 || 
-            searchCriteria.authors.every(author => 
-                book.authors.some(a => a.toLowerCase().includes(author.toLowerCase()))
-            );
+        const matchesAuthors = !formData.authors || formData.authors.split(',')
+            .every(author => book.authors.some(a => 
+                a.toLowerCase().includes(author.trim().toLowerCase())
+            ));
 
-        const matchesCategories = searchCriteria.categories.length === 0 ||
-            searchCriteria.categories.every(category => book.categories.includes(category));
+        const matchesCategories = selectedCategories.length === 0 ||
+            selectedCategories.every(category => book.categories.includes(category));
 
-        return matchesTitle && matchesIsbn && matchesPageCount && matchesStatus && 
-               matchesDate && matchesAuthors && matchesCategories;
+        return matchesTitle && matchesIsbn && matchesPageCount && 
+               matchesStatus && matchesDate && matchesAuthors && matchesCategories;
     });
 
     return (
         <div>
             <div className="container py-5">
+                <h2 className="mb-4">Advanced Search</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="row g-3">
+                        <Typing 
+                            label="Title"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            error={errors.title}
+                        />
+                        
+                        <Typing 
+                            label="ISBN"
+                            name="isbn"
+                            value={formData.isbn}
+                            onChange={handleInputChange}
+                            error={errors.isbn}
+                        />
+                        
+                        <Typing 
+                            label="Page Count"
+                            name="pageCount"
+                            type="number"
+                            value={formData.pageCount}
+                            onChange={handleInputChange}
+                            error={errors.pageCount}
+                        />
 
-            <h2 className="mb-4">Advanced Search</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="row g-3">
-                    <Typing 
-                        label="Title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                    />
-                    
-                    <Typing 
-                        type="number"
-                        label="ISBN"
-                        name="isbn"
-                        value={formData.isbn}
-                        onChange={handleInputChange}
-                    />
-                    
-                    <Typing 
-                        type="number"
-                        label="Page Count"
-                        name="pageCount"
-                        value={formData.pageCount}
-                        onChange={handleInputChange}
-                    />
+                        <Typing 
+                            label="Status"
+                            name="status"
+                            value={formData.status}
+                            onChange={handleInputChange}
+                        />
 
-                    <Typing 
-                        label="Status"
-                        name="status"
-                        value={formData.status}
-                        onChange={handleInputChange}
-                    />
-
-
-                    <div className="col-md-6">
-                        <label className="form-label">Published Date Range</label>
-                        <div className="row g-2">
-                            <div className="col-6">
-                                <input
-                                    type="date"
-                                    name="dateFrom"
-                                    className="form-control"
-                                    value={formData.dateFrom}
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                            <div className="col-6">
-                                <input
-                                    type="date"
-                                    name="dateTo"
-                                    className="form-control"
-                                    value={formData.dateTo}
-                                    onChange={handleInputChange}
-                                />
+                        <div className="col-md-6">
+                            <label className="form-label">Published Date Range</label>
+                            <div className="row g-2">
+                                <div className="col-6">
+                                    <Typing 
+                                        label=""
+                                        name="dateFrom"
+                                        type="date"
+                                        value={formData.dateFrom}
+                                        onChange={handleInputChange}
+                                        parentClass=""
+                                    />
+                                </div>
+                                <div className="col-6">
+                                    <Typing 
+                                        label=""
+                                        name="dateTo"
+                                        type="date"
+                                        value={formData.dateTo}
+                                        onChange={handleInputChange}
+                                        parentClass=""
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="col-md-6">
-                        <label className="form-label">Authors (comma separated)</label>
-                        <input
-                            type="text"
+                        <Typing 
+                            label="Authors"
                             name="authors"
-                            className="form-control"
                             value={formData.authors}
                             onChange={handleInputChange}
-                            placeholder="author1, author2, ..."
+                            error={errors.authors}
                         />
-                    </div>
 
-                    <div className="col-12">
-                        <label className="form-label">Categories</label>
-                        <div className="row g-3">
-                            {categories.map(category => (
-                                <div className="col-md-3" key={category}>
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            checked={selectedCategories.includes(category)}
-                                            onChange={() => handleCategoryChange(category)}
-                                            id={`category-${category}`}
-                                        />
-                                        <label 
-                                            className="form-check-label" 
-                                            htmlFor={`category-${category}`}
-                                        >
-                                            {category}
-                                        </label>
+                        <div className="col-12">
+                            <label className="form-label">Categories</label>
+                            <div className="row g-3">
+                                {categories.map(category => (
+                                    <div className="col-md-3" key={category}>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={selectedCategories.includes(category)}
+                                                onChange={() => handleCategoryChange(category)}
+                                                id={`category-${category}`}
+                                            />
+                                            <label 
+                                                className="form-check-label" 
+                                                htmlFor={`category-${category}`}
+                                            >
+                                                {category}
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="col-12 mt-4">
+                            <button type="submit" className="btn btn-primary me-2">
+                                Search
+                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={handleClear}>
+                                Clear
+                            </button>
                         </div>
                     </div>
-
-                    <div className="col-12 mt-4">
-                        <button type="submit" className="btn btn-primary me-2">
-                            Search
-                        </button>
-                        <button type="button" className="btn btn-secondary" onClick={handleClear}>
-                            Clear
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-            {
-                searchCriteria.isSearchActive ? (
-                    <div className="alert alert-warning mt-4">
-                        No books matched.
-                    </div>
-                ) : <BookDisplay books={filteredBooks}/>
-            }
+                </form>
+            </div>
+            <BookDisplay books={filteredBooks}/>
         </div>
     );
 }
