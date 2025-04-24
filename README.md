@@ -13,7 +13,7 @@ A full-stack application for managing and organizing your book collection, built
 1. Clone the repository
 2. In the root folder, run:
 ```bash
-npm run install
+cd react-ts && npm install && cd ../next-js && npm install && cd ..
 ```
 
 ### Running the Project
