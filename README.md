@@ -1,6 +1,6 @@
 # 📚 Books Management
 
-A full-stack application for managing and organizing your book collection, built with React, TypeScript, and Next.js.
+A simple application for managing and organizing your book collection, built with React, TypeScript, and Next.js.
 
 ## 🚀 Getting Started
 
