@@ -77,7 +77,7 @@ function Navbar() {
                                 {filteredBooks.map(book => (
                                     <Link 
                                         key={book._id}
-                                        to={`http://localhost:3000/book/${book._id}`}
+                                        to={`${import.meta.env.VITE_BOOK_DETAIL_URL}/book/${book._id}`}
                                         className="text-decoration-none text-dark"
                                         onClick={() => {
                                             setSearchTerm('');

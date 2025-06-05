@@ -48,7 +48,7 @@ function BookCard({ book }: { book: Book }) {
                     </div>
                 </div>
                 <div className="mt-auto">
-                    <a className="btn btn-outline-primary w-100" href={`http://localhost:3000/book/${book._id}`}>View Details</a>
+                    <a className="btn btn-outline-primary w-100" href={`${import.meta.env.VITE_BOOK_DETAIL_URL}/book/${book._id}`}>View Details</a>
                 </div>
             </div>
         </div>
