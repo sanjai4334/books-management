@@ -18,6 +18,13 @@ cd react-ts && npm install && cd ../next-js && npm install && cd ..
 
 ### Running the Project
 
+Add environment variable:
+1. Create an `.env` file in `react-ts` folder
+2. Paste this into the file
+```ini
+VITE_BOOK_DETAIL_URL=http://localhost:3000
+```
+
 Start the development servers:
 ```bash
 npm run dev
